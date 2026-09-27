@@ -79,6 +79,16 @@ export function Footer({
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => {
+                        if (social.label === "Resume") {
+                          const link = document.createElement("a");
+                          link.href = social.href;
+                          link.download = "Ayush_Kumar_Singh_Resume.pdf";
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }
+                      }}
                       className="text-muted hover:text-ink text-[14px] transition-colors"
                     >
                       {social.label}
