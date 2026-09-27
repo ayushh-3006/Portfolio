@@ -120,6 +120,14 @@ export function Nav({ d, locale }: { d: Dictionary["nav"]; locale: Locale }) {
             href="/resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              const link = document.createElement("a");
+              link.href = "/resume.pdf";
+              link.download = "Ayush_Kumar_Singh_Resume.pdf";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
             className="hidden items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[12px] font-bold tracking-widest text-white uppercase transition-all hover:bg-white/[0.05] hover:border-white/40 sm:inline-flex"
           >
             READ RESUME
@@ -195,7 +203,15 @@ export function Nav({ d, locale }: { d: Dictionary["nav"]; locale: Locale }) {
                   href="/resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false);
+                    const link = document.createElement("a");
+                    link.href = "/resume.pdf";
+                    link.download = "Ayush_Kumar_Singh_Resume.pdf";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
                   className="text-accent block py-4 text-[17px] font-medium uppercase tracking-wider"
                 >
                   READ RESUME

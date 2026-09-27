@@ -1,3 +1,5 @@
+"use client";
+
 import { Reveal } from "@/components/ui/Reveal";
 import { Section, SectionTitle } from "@/components/ui/Section";
 import { site } from "@/config/site";
@@ -69,6 +71,16 @@ export function Contact({
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => {
+                    if (social.label === "Resume") {
+                      const link = document.createElement("a");
+                      link.href = social.href;
+                      link.download = "Ayush_Kumar_Singh_Resume.pdf";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  }}
                   className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted transition-all hover:bg-white/10 hover:text-ink"
                   aria-label={social.label}
                 >
