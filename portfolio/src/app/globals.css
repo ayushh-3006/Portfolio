@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens
+
+   Charcoal canvas with a two-tier colour system:
+
+   1. BLUE IS ACTION. `accent` and `accent-solid` are reserved for things the
+      visitor can do — CTAs, links, focus rings, active states. Nothing
+      decorative is ever blue, so blue reliably means "click this".
+
+   2. EVERY OTHER HUE IS IDENTITY. The categorical palette below gives each
+      service, capability and problem a fixed colour, so a card is recognisable
+      by hue before it is read, and the same idea keeps the same colour
+      wherever it reappears on the page.
+
+   Keeping those two jobs separate is what stops a colourful page from
+   becoming a confusing one: adding hues never dilutes the CTA signal.
+
+   Every value is checked against the canvas for WCAG AA (4.5:1) — the whole
+   palette measures between 5.2:1 and 11.9:1.
+--------------------------------------------------------------------------- */
+
+@theme {
+  --color-canvas: #08090a;
+  --color-surface: #0f1113;
+  --color-elevated: #16181c;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.16);
+
+  /* Text tones are chosen against the canvas for WCAG AA (4.5:1), not by eye.
+     `faint` was #5c626c, which measured 3.24:1 and failed — it is used for
+     eyebrows, labels and step numbers, all small text that has to be legible. */
+  --color-ink: #f4f5f7; /* 17.4:1 */
+  --color-muted: #8b919b; /* 6.28:1 */
+  --color-faint: #7c828c; /* 5.15:1 */
+
+  /* Two blues, because one cannot satisfy both directions:
+     `accent` is light enough to read AS text on the canvas (5.2:1);
+     `accent-solid` is dark enough for white text to sit ON it (4.69:1).
+     Using `accent` as a button fill would have given white-on-blue 3.84:1. */
+  --color-accent: #3d7bff;
+  --color-accent-solid: #2f6bf0;
+  --color-accent-bright: #6f9bff;
+  --color-accent-dim: #1e3a80;
+
+  /* Categorical palette. Identity only — never used for interactive affordance.
+     Contrast on canvas: cyan 11.0, violet 7.3, amber 11.9, emerald 10.4,
+     rose 7.4. All pass AA for small text. */
+  --color-tone-cyan: #22d3ee;
+  --color-tone-violet: #a78bfa;
+  --color-tone-amber: #fbbf24;
+  --color-tone-emerald: #34d399;
+  --color-tone-rose: #fb7185;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "SF Mono", monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Clears the sticky nav when jumping to an anchor. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    /* `clip`, not `hidden`. `overflow-x: hidden` on the body promotes body to
+       the scroll container, which pins window.scrollY at 0 and breaks the
+       sticky nav, the mobile contact bar and every useScroll effect. `clip`
+       contains the decorative blooms without touching scrolling. */
+    overflow-x: clip;
+  }
+
+  /* Display sizes need noticeably tighter tracking than Inter ships with. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Only suppress the ring for pointer users, never for keyboard users. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities
+--------------------------------------------------------------------------- */
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+/* Fades a scrolling edge out rather than cutting it off. */
+@utility mask-fade-r {
+  mask-image: linear-gradient(to right, #000 80%, transparent 100%);
+}
+
+@utility hairline-t {
+  border-top: 1px solid var(--color-hairline);
+}
+
+@utility hairline-b {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+   Ambient effects
+--------------------------------------------------------------------------- */
+
+/* Faint engineering grid. Deliberately below the noise floor — it should
+   register as texture, never as a pattern you actively look at. */
+.grid-field {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+.glow-accent {
+  box-shadow:
+    0 0 0 1px rgba(61, 123, 255, 0.35),
+    0 8px 40px -12px rgba(61, 123, 255, 0.55);
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.availability-ping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: #4ade80;
+  animation: pulse-ring 2.4s var(--ease-out-soft) infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 42s linear infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion
+   Single kill switch. JS-driven animation is disabled separately via
+   useReducedMotion() in lib/motion.ts, so this only covers CSS.
+   The site must remain completely usable and legible with motion off.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .availability-ping::after,
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Additional motion
+--------------------------------------------------------------------------- */
+
+/* Very slow diagonal drift on the hero grid. One full cycle takes 40s, so it
+   never reads as movement — it reads as the page being alive. Uses
+   background-position rather than transform so it composites without
+   repainting the elements above it. */
+@keyframes grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      72px 72px,
+      72px 72px;
+  }
+}
+
+.grid-drift {
+  animation: grid-drift 40s linear infinite;
+}
+
+/* Shimmer for the pricing statement rule — a single sweep on entry, drawing the
+   eye to the one line that carries the whole positioning. */
+@keyframes rule-sweep {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.rule-sweep {
+  animation: rule-sweep 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-drift,
+  .rule-sweep {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Devanagari
+--------------------------------------------------------------------------- */
+
+/*
+ * The site's micro-label style is Latin typography: monospace, uppercase, wide
+ * tracking. Two of those three are wrong for Devanagari — the script has no
+ * uppercase, and letter-spacing pulls apart conjuncts and matras that are meant
+ * to sit tight against their base character, which reads as broken rather than
+ * as styling.
+ *
+ * Specificity beats the Tailwind tracking utilities, so this neutralises them
+ * across the Hindi page in one rule rather than per component.
+ */
+[lang="hi"] .font-mono {
+  letter-spacing: 0.02em;
+}
+
+/* Devanagari needs more vertical room than Latin: matras sit above the
+   headline bar and below the baseline. Tight display leading that looks
+   confident in English collides in Hindi. */
+[lang="hi"] h1,
+[lang="hi"] h2 {
+  line-height: 1.18;
+}
